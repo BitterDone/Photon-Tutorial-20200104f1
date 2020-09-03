@@ -6,6 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 // public class PhotonConnect : MonoBehaviour
 public class PhotonConnect : MonoBehaviourPunCallbacks
@@ -21,6 +22,7 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
     private int roomNumber = 1;
     private const byte COLOR_CHANGE_EVENT = 0;
     private const byte BODY_TRACKING_EVENT = 1;
+    private bool connectionAttempted = false;
 
     public void onClick_test()
     {
@@ -52,6 +54,22 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
         _print(true, "Start start");
         PhotonNetwork.ConnectUsingSettings();
         _print(true, "Start started");
+    }
+
+    void Update()
+    {
+        if (!connectionAttempted && SceneManager.GetActiveScene().name == "SampleScene")
+        {
+            _print(true, "SampleScene active");
+            connectionAttempted = true;
+            PhotonNetwork.ConnectUsingSettings();
+
+        }
+        else if (!connectionAttempted)
+        {
+            _print(true, "!connectionAttempted && SampleScene inactive: " + SceneManager.GetActiveScene().name);
+        }
+
     }
     
     public override void OnConnectedToMaster()
