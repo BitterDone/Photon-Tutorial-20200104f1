@@ -27,6 +27,7 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
     public void onClick_test()
     {
         _print(true, "onclick test");
+        SendMessage();
     }
 
     private void Awake()
@@ -143,6 +144,15 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
     {
         _print(true, "removing event callback");
         PhotonNetwork.NetworkingClient.EventReceived -= NetworkingClient_EventReceived;
+    }
+    
+    public void SendMessage()
+    {
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions() {
+            Receivers = ReceiverGroup.All,
+        };
+        object[] datas = new object[] { "r, g, b" }; // base.photonView.ViewID,
+        PhotonNetwork.RaiseEvent(COLOR_CHANGE_EVENT, datas, raiseEventOptions, SendOptions.SendUnreliable);
     }
 
     private void NetworkingClient_EventReceived(EventData obj)
