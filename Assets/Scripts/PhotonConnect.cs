@@ -14,9 +14,8 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
     RoomOptions roomOptions;
     private byte maxPlayersPerRoom = 4;
     public static PhotonConnect Lobby;
-
-    [SerializeField]
-    private Text progressLabel;
+    public Text progressLabel;
+    public Text dataLabel;
     private string defaultRoomName = "defaultExerciseRoom";
     private int userIdCount;
     private int roomNumber = 1;
@@ -59,7 +58,7 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        if (!connectionAttempted && SceneManager.GetActiveScene().name == "SampleScene")
+        if (!connectionAttempted && SceneManager.GetActiveScene().name == "Launcher")
         {
             _print(true, "SampleScene active");
             connectionAttempted = true;
@@ -77,7 +76,7 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
     {
         _print(true, "OnConnectedToMaster begin");
         var randomUserId = UnityEngine.Random.Range(0, 999999);
-        PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.AutomaticallySyncScene = false;
         PhotonNetwork.AuthValues = new AuthenticationValues();
         PhotonNetwork.AuthValues.UserId = randomUserId.ToString();
         userIdCount++;
@@ -151,40 +150,42 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions() {
             Receivers = ReceiverGroup.All,
         };
-        object[] datas = new object[] { "r, g, b" }; // base.photonView.ViewID,
-        PhotonNetwork.RaiseEvent(COLOR_CHANGE_EVENT, datas, raiseEventOptions, SendOptions.SendUnreliable);
+        object[] datas = new object[] {"body tracking data from K4A app"};
+        PhotonNetwork.RaiseEvent(BODY_TRACKING_EVENT, datas, raiseEventOptions, SendOptions.SendUnreliable);
     }
 
     private void NetworkingClient_EventReceived(EventData obj)
     {
-        if (obj == null || obj.Code == null)
+        if (obj != null)
+        {
+            object[] datas = (object[])obj.CustomData;
+            switch (obj.Code)
+            {
+                case COLOR_CHANGE_EVENT:
+                    _print(true, "received COLOR_CHANGE_EVENT");
+                    break;
+                case BODY_TRACKING_EVENT:
+                    _print(true, "received BODY_TRACKING_EVENT");
+                    string coordinateString = (string)datas[0];
+                    _print(true, coordinateString);
+                    break;
+                default:
+                    _print(true, "default unhandled obj.Code: " + obj.Code);
+                    break;
+            }
+        }
+        else
         {
             _print(true, "invalid EventData obj recieved");
             return;
         }
-
-        object[] datas = (object[])obj.CustomData;
-        switch (obj.Code)
-        {
-            case COLOR_CHANGE_EVENT:
-                _print(true, "received COLOR_CHANGE_EVENT");
-                break;
-            case BODY_TRACKING_EVENT:
-                _print(true, "received BODY_TRACKING_EVENT");
-
-                string coordinateString = (string)datas[0];
-                _print(true, coordinateString);
-                break;
-            default:
-                _print(true, "default unhandled obj.Code: " + obj.Code);
-                break;
-        }
     }
-#endregion
+    #endregion
 
-    private void _print(bool shouldPrint, string msg)
+    private void _print(bool shouldPrint, string msg, string data = "")
     {
         if (shouldPrint) Debug.Log(msg);
         if (shouldPrint) progressLabel.text += "\n" + msg;
+        if (data.Length > 0) dataLabel.text = data;
     }
 }
