@@ -12,8 +12,8 @@ EditorBuildSettings:
     path: Assets/MRTK/SDK/StandardAssets/Scenes/DefaultLightingScene.unity
     guid: 7e54e36c44f826c438c95da79f8de638
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
+    path: Assets/Scenes/Launcher.unity
+    guid: b0c300691db28d44f96e485a9fef04cc
   m_configObjects:
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 18a4f323e21e0ee4e93e02f4ec7001e3, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e7a022cf0beff1c4fbdf9b4371d91d5f, type: 2}

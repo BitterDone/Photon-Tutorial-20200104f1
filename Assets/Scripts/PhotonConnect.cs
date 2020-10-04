@@ -165,9 +165,8 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
                     _print(true, "received COLOR_CHANGE_EVENT");
                     break;
                 case BODY_TRACKING_EVENT:
-                    _print(true, "received BODY_TRACKING_EVENT");
-                    string coordinateString = (string)datas[0];
-                    _print(true, coordinateString);
+                    //_print(true, "received BODY_TRACKING_EVENT");
+                    DecodeCoordinateString((string)datas[0]);                    
                     break;
                 default:
                     _print(true, "default unhandled obj.Code: " + obj.Code);
@@ -187,5 +186,43 @@ public class PhotonConnect : MonoBehaviourPunCallbacks
         if (shouldPrint) Debug.Log(msg);
         if (shouldPrint) progressLabel.text += "\n" + msg;
         if (data.Length > 0) dataLabel.text = data;
+    }
+
+
+    public JointUpdater jI;
+    private void DecodeCoordinateString(string input)
+    {
+        // _print(true, input);
+
+        Dictionary<int, Vector3> JointData = new Dictionary<int, Vector3>();
+        string[] JointString = input.Split('*');//split each entry apart
+        
+        // _print(true, JointString.Length.ToString());
+
+        for(int i = 0; i < JointString.Length; i++)//iterate through each entry
+        {
+            // _print(true, "Joint Id: " + i);
+            // _print(true, JointString[i]);
+
+            string[] singleJoint = JointString[i].Split('(');//seperate joint index from vector3
+            // _print(true, "Length of singleJoint: " + singleJoint.Length);
+
+            //int jointIndex = int.Parse(singleJoint[0]);//get index as int
+            // _print(true, "singleJoint 0: " +singleJoint[0]);
+            // _print(true, "singleJoint 1: " +singleJoint[1]);
+
+            string[] jointPos = singleJoint[1].Split(',');//split vector3 info into 3 parts
+            Vector3 jointPosV3 = Vector3.zero;//create empty vector 3
+
+            //assign float values to vector 3
+            jointPosV3.x = float.Parse(jointPos[0])/-1000;
+            jointPosV3.y = float.Parse(jointPos[1])/1000;
+            jointPosV3.z = float.Parse(jointPos[2])/1000;
+            // _print(true, jointPosV3.ToString());
+            //add index to diction to apply to skeleton later
+            JointData.Add(i, jointPosV3);            
+        }
+
+        jI.UpdateJointPos(JointData);
     }
 }
